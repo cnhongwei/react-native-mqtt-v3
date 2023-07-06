@@ -75,6 +75,8 @@ dependencies {
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
+  implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5"
+  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
 
 if (isNewArchitectureEnabled()) {
