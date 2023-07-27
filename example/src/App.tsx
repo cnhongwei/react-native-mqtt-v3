@@ -1,6 +1,13 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text, Button, FlatList } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  FlatList,
+  SafeAreaView,
+} from 'react-native';
 import {
   createMqttClient,
   type MqttOptions,
@@ -332,7 +339,7 @@ export default function App() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text>Select client</Text>
       <View style={styles.row}>
         {clientOptions.map((item, index) => (
@@ -482,7 +489,7 @@ export default function App() {
           keyExtractor={(item) => item.id}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

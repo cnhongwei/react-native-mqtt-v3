@@ -207,7 +207,7 @@ extension MqttClient: CocoaMQTTDelegate {
     
     func mqtt(_ mqtt: CocoaMQTT, didPublishMessage message: CocoaMQTTMessage, id: UInt16) {
         NSLog("CocoaMQTTDelegateLog-didPublishMessage1 \(message.topic)")
-        NSLog("CocoaMQTTDelegateLog-didPublishMessage2 \(message.string!)")
+        NSLog("CocoaMQTTDelegateLog-didPublishMessage2 \(message.string ?? "")")
         NSLog("CocoaMQTTDelegateLog-didPublishMessage3 \(id)")
         self.publishResolve?(nil)
         self.publishResolve = nil
@@ -220,7 +220,7 @@ extension MqttClient: CocoaMQTTDelegate {
     
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) {
         NSLog("CocoaMQTTDelegateLog-didPublishMessage1 \(message.topic)")
-        NSLog("CocoaMQTTDelegateLog-didPublishMessage2 \(message.string!)")
+        NSLog("CocoaMQTTDelegateLog-didPublishMessage2 \(message.string ?? "")")
         NSLog("CocoaMQTTDelegateLog-didReceiveMessage3 \(id)")
         
         sendEvent(name: EventType.MqttV3OnMessage.rawValue+self.id, body: [
