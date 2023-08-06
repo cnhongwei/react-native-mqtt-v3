@@ -115,7 +115,8 @@ export interface MqttOptions {
 }
 
 type ListenerSubscription = Pick<EventSubscription, 'remove'>;
-type DisConnectListener = (event: { message: string }) => void;
+type ConnectListener = () => void;
+type DisconnectListener = (event: { message: string }) => void;
 type MessageListener = (event: {
   topic: string;
   base64Message: string;
@@ -133,7 +134,8 @@ export interface MqttClient {
     qos?: number,
     retained?: boolean
   ) => Promise<void>;
-  onDisconnect: (listener: DisConnectListener) => ListenerSubscription;
+  onConnect: (listener: ConnectListener) => ListenerSubscription;
+  onDisconnect: (listener: DisconnectListener) => ListenerSubscription;
   onMessage: (listener: MessageListener) => ListenerSubscription;
 }
 
@@ -149,6 +151,9 @@ export async function createMqttClient(
       return MqttV3.disconnect(options.clientId);
     },
     close: () => {
+      mqttV3EventEmitter.removeAllListeners(
+        'MqttV3:onConnect:' + options.clientId
+      );
       mqttV3EventEmitter.removeAllListeners(
         'MqttV3:onDisconnect:' + options.clientId
       );
@@ -181,15 +186,21 @@ export async function createMqttClient(
         retained,
       });
     },
-    onMessage: (listener: MessageListener) => {
+    onConnect: (listener: DisconnectListener) => {
       return mqttV3EventEmitter.addListener(
-        'MqttV3:onMessage:' + options.clientId,
+        'MqttV3:onConnect:' + options.clientId,
         listener
       );
     },
-    onDisconnect: (listener: DisConnectListener) => {
+    onDisconnect: (listener: DisconnectListener) => {
       return mqttV3EventEmitter.addListener(
         'MqttV3:onDisconnect:' + options.clientId,
+        listener
+      );
+    },
+    onMessage: (listener: MessageListener) => {
+      return mqttV3EventEmitter.addListener(
+        'MqttV3:onMessage:' + options.clientId,
         listener
       );
     },

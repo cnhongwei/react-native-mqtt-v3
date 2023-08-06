@@ -17,6 +17,7 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -41,6 +42,7 @@ import javax.net.ssl.X509TrustManager;
 
 public class MqttV3Client {
   public static final String NAME = "MqttV3";
+  public static final String CONNECT_PREFIX = NAME + ":onConnect:";
   public static final String DISCONNECT_PREFIX = NAME + ":onDisconnect:";
   public static final String MESSAGE_PREFIX = NAME + ":onMessage:";
   private static final Map<String, MqttAndroidClient> clients = new HashMap<>();
@@ -127,7 +129,13 @@ public class MqttV3Client {
     Log.d(NAME, "create mqtt v3 client " + url);
     MqttAndroidClient mqttAndroidClient = new MqttAndroidClient(reactApplicationContext, url, clientId, new MemoryPersistence());
 
-    mqttAndroidClient.setCallback(new MqttCallback() {
+    mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+      @Override
+      public void connectComplete(boolean reconnect, String serverURI) {
+        Log.d(NAME, "connectComplete... reconnect:" + reconnect);
+        sendEvent(reactApplicationContext, CONNECT_PREFIX + mqttAndroidClient.getClientId(), writableMapOf("clientId", clientId));
+      }
+
       @Override
       public void connectionLost(Throwable cause) {
         Log.d(NAME, "connectionLost...", cause);
@@ -180,6 +188,8 @@ public class MqttV3Client {
         mqttConnectOptions.setPassword(clientOptions.getPassword().toCharArray());
       }
     }
+
+    mqttConnectOptions.setAutomaticReconnect(clientOptions.isAutomaticReconnect());
 
     try {
       String p12 = clientOptions.getP12();

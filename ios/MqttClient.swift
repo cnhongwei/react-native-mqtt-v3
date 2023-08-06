@@ -63,6 +63,8 @@ class MqttClient {
             self.client.password = password
         }
         
+        self.client.autoReconnect = optionsData["automaticReconnect"] as! Bool? ?? true
+        
         self.client.delegate = self
     }
     
@@ -96,6 +98,7 @@ class MqttClient {
     }
     
     func publish(topic: String, base64Body: String, qos: CocoaMQTTQoS, retained: Bool, resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+        NSLog("react-native-mqtt-v3:publish topic:\(topic) qos:\(qos)");
         self.publishResolve = resolve
         self.publishReject = reject
         
@@ -153,9 +156,12 @@ extension MqttClient: CocoaMQTTDelegate {
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
-        NSLog("CocoaMQTTDelegateLog-didConnectAck")
+        NSLog("react-native-mqtt-v3:didConnectAck ack:\(ack)")
         if (ack == .accept) {
             self.connectResolve?(self.id)
+            sendEvent(name: EventType.MqttV3OnConnect.rawValue+self.id, body: [
+                "clientId": self.id
+            ])
         } else {
             self.connectReject?("error", ack.description, nil)
         }
@@ -164,7 +170,7 @@ extension MqttClient: CocoaMQTTDelegate {
     }
     
     func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?) {
-        NSLog("CocoaMQTTDelegateLog-mqttDidDisconnect")
+        NSLog("react-native-mqtt-v3:didDisconnect err:\(err)");
         if let error = err {
             NSLog("CocoaMQTTDelegateLog-mqttDidDisconnect2 \(err)")
             NSLog("CocoaMQTTDelegateLog-mqttDidDisconnect3 \(error.localizedDescription)")
@@ -206,16 +212,14 @@ extension MqttClient: CocoaMQTTDelegate {
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didPublishMessage message: CocoaMQTTMessage, id: UInt16) {
-        NSLog("CocoaMQTTDelegateLog-didPublishMessage1 \(message.topic)")
-        NSLog("CocoaMQTTDelegateLog-didPublishMessage2 \(message.string ?? "")")
-        NSLog("CocoaMQTTDelegateLog-didPublishMessage3 \(id)")
-        self.publishResolve?(nil)
-        self.publishResolve = nil
-        self.publishReject = nil
+        NSLog("react-native-mqtt-v3:didPublishMessage id:\(id) topic:\(message.topic)");
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didPublishAck id: UInt16) {
-        NSLog("CocoaMQTTDelegateLog-didPublishAck")
+        NSLog("react-native-mqtt-v3:didPublishAck id:\(id)");
+        self.publishResolve?(nil)
+        self.publishResolve = nil
+        self.publishReject = nil
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) {
@@ -230,11 +234,11 @@ extension MqttClient: CocoaMQTTDelegate {
     }
     
     func mqttDidPing(_ mqtt: CocoaMQTT) {
-        NSLog("CocoaMQTTDelegateLog-mqttDidPing")
+        NSLog("react-native-mqtt-v3:didPing");
     }
     
     func mqttDidReceivePong(_ mqtt: CocoaMQTT) {
-        NSLog("CocoaMQTTDelegateLog-mqttDidReceivePong")
+        NSLog("react-native-mqtt-v3:didPong");
     }
     
     func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void) {

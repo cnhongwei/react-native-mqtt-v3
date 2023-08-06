@@ -364,6 +364,9 @@ export default function App() {
               .then((client) => {
                 clientRef.current = client;
                 setStatus('CREATED');
+                client.onConnect(() => {
+                  addMessage('onConnect');
+                });
                 client.onDisconnect(({ message }) => {
                   addMessage('onDisconnect:' + message);
                 });

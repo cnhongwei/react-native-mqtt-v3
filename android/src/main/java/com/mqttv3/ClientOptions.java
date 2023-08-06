@@ -18,6 +18,7 @@ public class ClientOptions {
   private String pass;
   private String ca;
   private boolean insecure;
+  private boolean automaticReconnect = true;
 
   public static ClientOptions fromReadableMap(ReadableMap options) {
     ClientOptions parameters = new ClientOptions();
@@ -48,6 +49,9 @@ public class ClientOptions {
     parameters.ca = StringUtil.trimToNull(options.getString("ca"));
     if (options.hasKey("insecure")) {
       parameters.insecure = options.getBoolean("insecure");
+    }
+    if (options.hasKey("automaticReconnect")) {
+      parameters.insecure = options.getBoolean("automaticReconnect");
     }
     return parameters;
   }
@@ -178,5 +182,13 @@ public class ClientOptions {
 
   public void setInsecure(boolean insecure) {
     this.insecure = insecure;
+  }
+
+  public boolean isAutomaticReconnect() {
+    return automaticReconnect;
+  }
+
+  public void setAutomaticReconnect(boolean automaticReconnect) {
+    this.automaticReconnect = automaticReconnect;
   }
 }
