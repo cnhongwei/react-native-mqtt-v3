@@ -1,6 +1,6 @@
 {
   "name": "react-native-mqtt-v3",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Native MQTT v3.1.1 for React Native",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
