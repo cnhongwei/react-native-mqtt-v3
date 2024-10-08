@@ -12,16 +12,12 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +35,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+
+import info.mqtt.android.service.MqttAndroidClient;
 
 public class MqttV3Client {
   public static final String NAME = "MqttV3";
@@ -127,7 +125,7 @@ public class MqttV3Client {
     }
     String url = clientOptions.getUrl();
     Log.d(NAME, "create mqtt v3 client " + url);
-    MqttAndroidClient mqttAndroidClient = new MqttAndroidClient(reactApplicationContext, url, clientId, new MemoryPersistence());
+    MqttAndroidClient mqttAndroidClient = new MqttAndroidClient(reactApplicationContext, url, clientId);
 
     mqttAndroidClient.setCallback(new MqttCallbackExtended() {
       @Override
@@ -219,7 +217,7 @@ public class MqttV3Client {
           promise.reject("error", exception == null ? "connect error" : exception.getMessage(), exception);
         }
       });
-    } catch (MqttException e) {
+    } catch (Exception e) {
       Log.d(NAME, "Error...", e);
       promise.reject("error", "connect error", e);
     }
@@ -245,7 +243,7 @@ public class MqttV3Client {
             promise.reject("error", exception == null ? "disconnect error" : exception.getMessage(), exception);
           }
         });
-      } catch (MqttException e) {
+      } catch (Exception e) {
         Log.e(NAME, "disconnect error...", e);
         promise.reject("error", e == null ? "disconnect error" : e.getMessage(), e);
       }
@@ -273,7 +271,7 @@ public class MqttV3Client {
           promise.reject("error", exception == null ? "subscribe error" : exception.getMessage(), exception);
         }
       });
-    } catch (MqttException e) {
+    } catch (Exception e) {
       Log.d(NAME, "subscribe error ...", e);
       promise.reject("error", e == null ? "subscribe error" : e.getMessage(), e);
     }
@@ -299,7 +297,7 @@ public class MqttV3Client {
           promise.reject("error", exception == null ? "subscribe error" : exception.getMessage(), exception);
         }
       });
-    } catch (MqttException e) {
+    } catch (Exception e) {
       Log.d(NAME, "unsubscribe error ...", e);
       promise.reject("error", e == null ? "unsubscribe error" : e.getMessage(), e);
     }
@@ -328,7 +326,7 @@ public class MqttV3Client {
           promise.reject("error", exception == null ? "subscribe error" : exception.getMessage(), exception);
         }
       });
-    } catch (MqttException e) {
+    } catch (Exception e) {
       Log.d(NAME, "publish error ...", e);
       promise.reject("error", e == null ? "publish error" : e.getMessage(), e);
     }
