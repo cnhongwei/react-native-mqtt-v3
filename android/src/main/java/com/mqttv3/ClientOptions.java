@@ -51,7 +51,7 @@ public class ClientOptions {
       parameters.insecure = options.getBoolean("insecure");
     }
     if (options.hasKey("automaticReconnect")) {
-      parameters.insecure = options.getBoolean("automaticReconnect");
+      parameters.automaticReconnect = options.getBoolean("automaticReconnect");
     }
     return parameters;
   }
